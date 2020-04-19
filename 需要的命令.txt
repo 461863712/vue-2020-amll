@@ -1,0 +1,62 @@
+创建 ：vue create mall  选第一个coderwhy，最简单的
+启动：npm run serve
+/*-----------------------------------------------------------------*/
+目录结构：
+资源
+src/asset/img
+src/asset/css
+
+视图主页面
+src/views/
+
+组件
+src/components/common公共
+src/components/content当前项目相关的公共组件
+
+路由
+src/router
+
+vuex
+src/store
+
+网络相关
+src/network
+
+公共js文件
+src/common公共
+
+/*-----------------------------------------------------------------*/
+src/asset/css/normalize.css 在github的初始化css样式
+src/asset/css/base.css 自己的初始化css样式
+
+vue.config 别名
+module.exports = {
+    configureWebpack: {
+        resolve: {
+            alias: {
+                //'@':'src',默认就有的
+                'asset':'@/asset',
+                'common':'@/common',
+                'components':'@/components',
+                'network':'@/network',
+                'views':'@/views'
+            }
+        }
+    }
+}
+
+.editorconfig 写法配置
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+/*-----------------------------------------------------------------*/
+npm i -S vue-router
+npm i -S vuex
+npm i -S axios
