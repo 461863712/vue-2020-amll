@@ -10,11 +10,12 @@ src/asset/css
 src/views/
 
 组件
-src/components/common公共
+src/components/common公共组件
 src/components/content当前项目相关的公共组件
 
 路由
 src/router
+src/router/index.js
 
 vuex
 src/store
@@ -29,20 +30,19 @@ src/common公共
 src/asset/css/normalize.css 在github的初始化css样式
 src/asset/css/base.css 自己的初始化css样式
 
-vue.config 别名
+vue.config.js 别名
 module.exports = {
-    configureWebpack: {
-        resolve: {
-            alias: {
-                //'@':'src',默认就有的
-                'asset':'@/asset',
-                'common':'@/common',
-                'components':'@/components',
-                'network':'@/network',
-                'views':'@/views'
-            }
-        }
+  configureWebpack: {
+    resolve: {
+      alias: {
+        'assets': '@/assets',
+        'common': '@/common',
+        'components': '@/components',
+        'network': '@/network',
+        'views': '@/views',
+      }
     }
+  }
 }
 
 .editorconfig 写法配置
@@ -58,5 +58,11 @@ trim_trailing_whitespace = true
 
 /*-----------------------------------------------------------------*/
 npm i -S vue-router
-npm i -S vuex
 npm i -S axios
+npm i -S vuex
+
+/*
+baseURL = "http://152.136.185.210:8000/api/h8"
+baseURL = "http://123.207.32.32:8000/api/h8"
+baseURL = "http://106.54.54.237:8000/api/h8"
+*/
