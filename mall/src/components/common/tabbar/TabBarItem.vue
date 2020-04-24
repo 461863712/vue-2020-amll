@@ -1,14 +1,16 @@
 <template>
-  <div class="tab-bar-item" @click="itemClick">
-    <div v-if="isActive">
-      <slot name="item-icon-active"></slot>
-    </div>
-    <div v-else>
-      <slot name="item-icon"></slot>
-    </div>
-    <div :style="activeStyle">
-      <slot name="item-text"></slot>
-    </div>
+  <div class="tab-bar-item">
+    <router-link :to="path">
+      <div v-if="isActive">
+        <slot name="item-icon-active"></slot>
+      </div>
+      <div v-else>
+        <slot name="item-icon"></slot>
+      </div>
+      <div :style="activeStyle">
+        <slot name="item-text"></slot>
+      </div>
+    </router-link>
   </div>
 </template>
 
@@ -36,12 +38,6 @@
         //字体颜色
         return this.isActive ? {color: this.activeColor} : {}
       }
-    },
-    methods: {
-      itemClick() {
-        // this.$router.replace(this.path)
-        this.$router.push(this.path);//这个更改需要在router/index配置，不然重复点击tabbar会报错
-      }
     }
   }
 </script>
@@ -52,10 +48,5 @@
     text-align: center;
     height: 49px;
     font-size: 14px;
-  }
-  .tab-bar-item img{
-    height: 24px;
-    width: 24px;
-    margin: 3px 0 0 0;
   }
 </style>

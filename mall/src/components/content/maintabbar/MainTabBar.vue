@@ -1,6 +1,8 @@
 <template>
   <div>
-    <router-view></router-view>
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
     <tab-bar location="bottom">
       <tab-bar-item path="/home" activeColor="red">
         <img slot="item-icon" src="~assets/img/tabbar/home.svg" alt="">
@@ -39,5 +41,9 @@
 </script>
 
 <style scoped>
-
+  img{
+    height: 24px;
+    width: 24px;
+    margin: 3px 0 0 0;
+  }
 </style>

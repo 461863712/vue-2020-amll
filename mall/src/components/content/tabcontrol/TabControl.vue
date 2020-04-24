@@ -26,7 +26,7 @@
     methods: {
       controlItem(index) {
         this.currentIndex = index;
-        //index传出去到父组件
+        //index传出去到父组件,做点击切换数据
         this.$emit('tabClick',index);
       }
     }

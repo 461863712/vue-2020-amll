@@ -4,21 +4,29 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <!--轮播图-->
-    <home-swiper :banners="banners.list"></home-swiper>
-    <!--推荐-->
-    <recommend :recommends="recommends.list"></recommend>
-    <!--本周流行-->
-    <div class="popular">
-      <h1>本周流行</h1>
-      <recommend :recommends="popular"></recommend>
+    <!--为了实现吸顶-->
+    <div class="tab-control-top" v-show="isTabFixed">
+      <tab-control ref="tabControl1" :tabcontrol="tabControl" @tabClick="tabClick"></tab-control>
     </div>
-    <!--内容导航-->
-    <div class="tab-control-top">
-      <tab-control :tabcontrol="tabControl" @tabClick="tabClick"></tab-control>
-    </div>
-    <!--内容-->
-    <goods-list-item :goods="goods[currentType].list"></goods-list-item>
+    <scroll class="content" @pullingUp="loadMore" :pull-up-load="true" ref="contentScroll" :probe-type="3" @scroll="scroll">
+      <!--轮播图-->
+      <home-swiper :banners="banners.list" @swiperImageLoad="swiperImageLoad"></home-swiper>
+      <!--推荐-->
+      <recommend :recommends="recommends.list"></recommend>
+      <!--本周流行-->
+      <div class="popular">
+        <h1>本周流行</h1>
+        <recommend :recommends="popular"></recommend>
+      </div>
+      <!--内容导航-->
+      <div class="tab-control-top">
+        <tab-control ref="tabControl2" :tabcontrol="tabControl" @tabClick="tabClick"></tab-control>
+      </div>
+      <!--内容-->
+      <goods-list-item :goods="goods[currentType].list"></goods-list-item>
+    </scroll>
+    <!--调转到顶部-->
+    <back-top @backTop="backTop" v-show="backTopShowHide"></back-top>
   </div>
 </template>
 
@@ -29,8 +37,11 @@
   import Recommend from 'components/content/recommend/Recommend';
   import TabControl from 'components/content/tabcontrol/TabControl';
   import GoodsListItem from 'components/content/goods/GoodsListItem';
+  import Scroll from 'components/common/scroll/Scroll'
+  import BackTop from 'components/common/backtop/BackTop'
   //无导出
   import {getHomeMultidata, getHomeGoods} from "network/home/home";
+  import {debounce} from 'common/utils'
 
   export default {
     name: "home",
@@ -93,7 +104,10 @@
           'pop': {page: 0, list: []},
           'new': {page: 0, list: []},
           'sell': {page: 0, list: []}
-        }
+        },
+        backTopShowHide: false,
+        tabOffsetTop: 0,
+        isTabFixed: false
       }
     },
     components: {
@@ -101,13 +115,25 @@
       HomeSwiper,
       Recommend,
       TabControl,
-      GoodsListItem
+      GoodsListItem,
+      Scroll,
+      BackTop
     },
     created() {
       this.getHomeMultidata();
       this.getHomeGoods('pop');
       this.getHomeGoods('new');
       this.getHomeGoods('sell');
+      //因为图片异步加载，出现滚动到一半就不能下拉，所以要重新计算scroll高度
+      //判断图片是否加载完成
+    },
+    mounted() {
+      //图片加载完成的事件监听
+      const refresh = debounce(this.$refs.contentScroll.refresh,20);
+      this.$bus.$on('imageLoad', () => {
+        // this.$refs.contentScroll.refresh();
+        refresh();//防抖
+      });
     },
     methods: {
       /**
@@ -122,9 +148,10 @@
       getHomeGoods(type) {
         const page = this.goods[type].page+1;
         getHomeGoods(type,page).then(res => {
-          console.log(res);
           this.goods[type].list.push(...res.data.list);
           this.goods[type].page += 1;
+          //下拉加载更多
+          this.$refs.contentScroll.finishPullUp();
         })
       },
       /**
@@ -144,6 +171,28 @@
           default:
             break;
         }
+        //同步吸顶和内容导航
+        this.$refs.tabControl1.currentIndex = index;
+        this.$refs.tabControl2.currentIndex = index;
+      },
+      backTop() {
+        //当前滚动区域的scroll
+        this.$refs.contentScroll.scrollTo(0, 0, 500);
+      },
+      scroll(position) {
+        // position.y < -1000 ? this.backTopShowHide=true : this.backTopShowHide=false;
+        //判断回到顶部按钮是否显示
+        this.backTopShowHide = position.y < -1000;
+        //决定内容导航石头吸顶
+        this.isTabFixed = position.y < -this.tabOffsetTop;
+      },
+      loadMore() {
+        //下拉加载数据
+        this.getHomeGoods(this.currentType);
+      },
+      swiperImageLoad() {
+        //获取内容导航的top值
+        this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
       }
     },
   }
@@ -152,6 +201,7 @@
 <style scoped>
   #home{
     padding-top: 44px;
+    height: 100vh;
   }
   .home-nav{
     background-color: var(--color-tint);
@@ -166,10 +216,7 @@
     font-size: 16px;
     text-align: center;
   }
-  /*固定导航*/
-  .tab-control-top{
-    background-color: var(--color-background);
-    position: sticky;
-    top: 44px;
+  .content{
+    height: calc(100% - 49px);
   }
 </style>

@@ -59,6 +59,7 @@ trim_trailing_whitespace = true
 /*-----------------------------------------------------------------*/
 npm i -S vue-router
 npm i -S axios
+npm i -$ better-scroll 滚动懒加载
 npm i -S vuex
 
 /*
